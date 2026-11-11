@@ -58,6 +58,18 @@ output "eks_clusters_identity" {
   description = "Map of identity values across all eks_clusters, keyed the same as var.eks_clusters"
   value       = { for k, v in aws_eks_cluster.eks_clusters : k => v.identity if v.identity != null && length(v.identity) > 0 }
 }
+output "eks_clusters_kube_api_server_config" {
+  description = "Map of kube_api_server_config values across all eks_clusters, keyed the same as var.eks_clusters"
+  value       = { for k, v in aws_eks_cluster.eks_clusters : k => one(v.kube_api_server_config) if v.kube_api_server_config != null && length(v.kube_api_server_config) > 0 }
+}
+output "eks_clusters_kube_controller_manager_config" {
+  description = "Map of kube_controller_manager_config values across all eks_clusters, keyed the same as var.eks_clusters"
+  value       = { for k, v in aws_eks_cluster.eks_clusters : k => one(v.kube_controller_manager_config) if v.kube_controller_manager_config != null && length(v.kube_controller_manager_config) > 0 }
+}
+output "eks_clusters_kube_scheduler_config" {
+  description = "Map of kube_scheduler_config values across all eks_clusters, keyed the same as var.eks_clusters"
+  value       = { for k, v in aws_eks_cluster.eks_clusters : k => one(v.kube_scheduler_config) if v.kube_scheduler_config != null && length(v.kube_scheduler_config) > 0 }
+}
 output "eks_clusters_kubernetes_network_config" {
   description = "Map of kubernetes_network_config values across all eks_clusters, keyed the same as var.eks_clusters"
   value       = { for k, v in aws_eks_cluster.eks_clusters : k => one(v.kubernetes_network_config) if v.kubernetes_network_config != null && length(v.kubernetes_network_config) > 0 }

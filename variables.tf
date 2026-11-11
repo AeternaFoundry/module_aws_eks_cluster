@@ -33,6 +33,21 @@ Optional:
         - provider (required, block):
             - key_arn (required)
         - resources (required)
+    - kube_api_server_config (block):
+        - event_ttl (optional)
+        - service_node_port_range (optional, block):
+            - max_port (optional)
+            - min_port (optional)
+    - kube_controller_manager_config (block):
+        - horizontal_pod_autoscaler_controller_config (optional, block):
+            - horizontal_pod_autoscaler_sync_period (optional)
+    - kube_scheduler_config (block):
+        - node_resources_fit (optional, block):
+            - scoring_strategy (optional, block):
+                - resource (optional, block):
+                    - name (optional)
+                    - weight (optional)
+                - type (optional)
     - kubernetes_network_config (block):
         - elastic_load_balancing (optional, block):
             - enabled (optional)
@@ -98,6 +113,29 @@ EOT
       })
       resources = set(string)
     }))
+    kube_api_server_config = optional(object({
+      event_ttl = optional(string)
+      service_node_port_range = optional(object({
+        max_port = optional(number)
+        min_port = optional(number)
+      }))
+    }))
+    kube_controller_manager_config = optional(object({
+      horizontal_pod_autoscaler_controller_config = optional(object({
+        horizontal_pod_autoscaler_sync_period = optional(string)
+      }))
+    }))
+    kube_scheduler_config = optional(object({
+      node_resources_fit = optional(object({
+        scoring_strategy = optional(object({
+          resource = optional(list(object({
+            name   = optional(string)
+            weight = optional(number)
+          })))
+          type = optional(string)
+        }))
+      }))
+    }))
     kubernetes_network_config = optional(object({
       elastic_load_balancing = optional(object({
         enabled = optional(bool)
@@ -137,6 +175,6 @@ EOT
       enabled = optional(bool)
     }))
   }))
-  # Note: 18 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
+  # Note: 19 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 

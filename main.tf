@@ -55,6 +55,56 @@ resource "aws_eks_cluster" "eks_clusters" {
     }
   }
 
+  dynamic "kube_api_server_config" {
+    for_each = each.value.kube_api_server_config != null ? [each.value.kube_api_server_config] : []
+    content {
+      event_ttl = kube_api_server_config.value.event_ttl
+      dynamic "service_node_port_range" {
+        for_each = kube_api_server_config.value.service_node_port_range != null ? [kube_api_server_config.value.service_node_port_range] : []
+        content {
+          max_port = service_node_port_range.value.max_port
+          min_port = service_node_port_range.value.min_port
+        }
+      }
+    }
+  }
+
+  dynamic "kube_controller_manager_config" {
+    for_each = each.value.kube_controller_manager_config != null ? [each.value.kube_controller_manager_config] : []
+    content {
+      dynamic "horizontal_pod_autoscaler_controller_config" {
+        for_each = kube_controller_manager_config.value.horizontal_pod_autoscaler_controller_config != null ? [kube_controller_manager_config.value.horizontal_pod_autoscaler_controller_config] : []
+        content {
+          horizontal_pod_autoscaler_sync_period = horizontal_pod_autoscaler_controller_config.value.horizontal_pod_autoscaler_sync_period
+        }
+      }
+    }
+  }
+
+  dynamic "kube_scheduler_config" {
+    for_each = each.value.kube_scheduler_config != null ? [each.value.kube_scheduler_config] : []
+    content {
+      dynamic "node_resources_fit" {
+        for_each = kube_scheduler_config.value.node_resources_fit != null ? [kube_scheduler_config.value.node_resources_fit] : []
+        content {
+          dynamic "scoring_strategy" {
+            for_each = node_resources_fit.value.scoring_strategy != null ? [node_resources_fit.value.scoring_strategy] : []
+            content {
+              dynamic "resource" {
+                for_each = scoring_strategy.value.resource != null ? scoring_strategy.value.resource : []
+                content {
+                  name   = resource.value.name
+                  weight = resource.value.weight
+                }
+              }
+              type = scoring_strategy.value.type
+            }
+          }
+        }
+      }
+    }
+  }
+
   dynamic "kubernetes_network_config" {
     for_each = each.value.kubernetes_network_config != null ? [each.value.kubernetes_network_config] : []
     content {
